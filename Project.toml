@@ -1,0 +1,9 @@
+name = "Invoice"
+uuid = "6f6450fa-a49b-40a9-985d-0dd239727e71"
+authors = ["Nicholas Shindler <shindler25@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
