@@ -11,11 +11,11 @@ function init_sync(url::String)
     cd(current_path)
 end
 
-function push_changes()
+function push_changes(;note="backup data")
     const current_path = pwd()
     cd(filedir)
     run(git(["add", "."]))
-    run(git(["commit", "-m", "\"backup data\""]))
+    run(git(["commit", "-m", "\"Balance_jl Auto Sync: $note\""]))
     run(git(["push", "-u", "origin", "main"]))
     cd(current_path)
 end
