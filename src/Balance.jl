@@ -1,6 +1,14 @@
 module Invoice
 using Dates, Crayons, DotEnv, UUIDs
 using BSON: @save, @load
+import Git
+DotEnv.config()
+
+filedir = haskey(ENV, "BALANCE_STORE") ? ENV["BALANCE_STORE"] : "~/.balance_jl"
+
+if !ispath(filedir)
+    mkdir(filedir)
+end
 
 struct AddressBlock
     name::String # human name
@@ -38,7 +46,8 @@ mutable struct Log
   end
 end
 
-include("template.jl")
+include("markdown.jl")
+include("sync.jl")
 
 function register_self()
   println("Is the Client a buisness? (y/N)")
