@@ -1,6 +1,5 @@
 function init_sync(url::String)
-    const current_path = pwd()
-    const git = Git.git()
+    current_path = pwd()
     cd(filedir)
     run(git(["init"]))
     run(git(["branch", "-m", "main"]))
@@ -12,7 +11,7 @@ function init_sync(url::String)
 end
 
 function push_changes(;note="backup data")
-    const current_path = pwd()
+    current_path = pwd()
     cd(filedir)
     run(git(["add", "."]))
     run(git(["commit", "-m", "\"Balance_jl Auto Sync: $note\""]))
@@ -22,7 +21,7 @@ end
 
 
 function pull_changes()
-    const current_path = pwd()
+    current_path = pwd()
     cd(filedir)
     run(git(["push", "-u", "origin", "main"]))
     cd(current_path)
