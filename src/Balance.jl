@@ -1,4 +1,4 @@
-module Invoice
+module Balance
 using Crayons, DotEnv, UUIDs, TerminalMenus, ImageInTerminal
 using BSON: @save, @load
 import Git
