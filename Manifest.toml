@@ -2,7 +2,7 @@
 
 julia_version = "1.8.3"
 manifest_format = "2.0"
-project_hash = "a2e4c91bf3d671a7e50cb3fd3852013b7b30d782"
+project_hash = "7625b833ffee0634deef55221949b2eeb5106fae"
 
 [[deps.BSON]]
 git-tree-sha1 = "2208958832d6e1b59e49f53697483a84ca8d664e"
@@ -17,6 +17,11 @@ version = "4.1.1"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+
+[[deps.DotEnv]]
+git-tree-sha1 = "d48ae0052378d697f8caf0855c4df2c54a97e580"
+uuid = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
+version = "0.3.1"
 
 [[deps.Printf]]
 deps = ["Unicode"]
