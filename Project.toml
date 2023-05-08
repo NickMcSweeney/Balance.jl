@@ -12,3 +12,13 @@ Git = "d7ba0133-e1db-5d97-8f8c-041e4b3a1eb2"
 ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
 TerminalMenus = "dc548174-15c3-5faf-af27-7997cfbde655"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+pandoc_jll = "c5432543-76ad-5c9d-82bf-db097047a5e2"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

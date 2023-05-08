@@ -1,4 +1,4 @@
-function register_self()
+function register_client()
   println("Is the Client a buisness? (y/N)")
   ans = readline(stdin)
   buisness = ""
@@ -12,18 +12,27 @@ function register_self()
   working_role = readline(stdin)
   println("What is your billing rate at the Client?")
   working_rate = readline(stdin)
+  while !isa(working_rate, Number)
+    try 
+      working_rate = parse(Float64, working_rate)
+    catch e
+      println("Rate given of $working_rate cannot be parsed as a number, try again please.")
+      working_rate = readline(stdin)
+    end
+  end
   println("How can the Client be contacted (email, phone, etc...):")
   contact = readline(stdin)
   println("Client Address [Builing Number + Street Name]:")
   line_one = readline(stdin)
-  println("Client Address [Post Code + City + Country]:")
+  println("Address [City, State Postcode, Country (optional)]:")
   line_two = readline(stdin)
 
   client_details = ClientDetails(working_role, working_rate, AddressBlock(full_name, buisness, contact, line_one, line_two))
-  @save joinpath(filedir, "client-details-$(UUIDs.uuid1).bson") client_details
+  @save joinpath(filedir, "client-details-$(UUIDs.uuid1()).bson") client_details
+  return client_details
 end
 
-function register_client()
+function register_self()
   println("What is your Full Legal Name")
   full_name = readline(stdin)
   nick_name = full_name
@@ -46,7 +55,7 @@ function register_client()
   contact = readline(stdin)
   println("Address [Builing Number + Street Name]:")
   line_one = readline(stdin)
-  println("Address [Post Code + City + Country]:")
+  println("Address [City, State Postcode, Country (optional)]:")
   line_two = readline(stdin)
 
   personal_details = PersonalDetails(working_title, full_name, AddressBlock(nick_name, buisness, contact, line_one, line_two))
@@ -55,20 +64,32 @@ function register_client()
 end
 
 function select_client()
+  println("Do you want to use an existing Client (Y/n)")
+  ans = readline(stdin)
+  if ans == "n" || ans == "N"
+    return register_client()
+  end
   println("--- Select Client ---")
   clients = get_clients()
-  menu = RadioMenu(clients, pagesize=4)
+  options = [opt for opt in keys(clients)]
+  if length(options) == 0
+    println("No registered Clients, starting new Client registration.")
+    return register_client()
+  end
+  menu = RadioMenu(options, pagesize=4)
   choice = request("Choose a Client:", menu)
   if choice != -1
-      println("Using ", client[choice], " for this record.")
+      println("Using ", options[choice], " for this record.")
+      cpath = clients[options[choice]]
+      @load joinpath(filedir, cpath) client_details
+      return client_details
   else
       println("Creating a new client.")
+      return register_client()
   end 
-  choice != -1 ? register_client() : clients[choice]
 end
 
-function log_hours()
-  client = select_client()
+function generate_work_item(client::ClientDetails)
   println("--- Logging Hours ---")
   println("What date is this for?")
   println("<ENTER> for current day or dd/mm")
@@ -81,5 +102,20 @@ function log_hours()
   println("Is this ok? (y/n)")
   println("Date: $day\nDescription: $description\nHours: $hours_worked\nCost: $(hours_worked*60)")
   res = readline(stdin)
-  res == "n" ? log_hours() : update_logs(get_client_id(client),day,hours_worked,description)
+  work_item = res == "n" ? generate_work_item(client) : WorkItem(get_client_id(client),day,hours_worked,description)
+end
+
+function log_hours()
+  client = select_client()
+  work_item = generate_work_item(client)
+  update_logs(work_item)
+end
+
+function export_invoice()
+  client = select_client()
+  println("What month do you want your invoice for? (1-12)")
+  month = parse(Int, readline(stdin))
+  println("What year do you want your invoice for? ie. 2023")
+  year = parse(Int, readline(stdin))
+  generate_invoice(client,month,year)
 end

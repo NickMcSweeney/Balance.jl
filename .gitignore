@@ -29,5 +29,7 @@ Manifest.toml
 
 # configuration file
 .env
+**/.env
 
 # End of https://www.toptal.com/developers/gitignore/api/julia
+.env

@@ -16,13 +16,15 @@ $(recipient.buisness != "" ? ">	$(recipient.buisness)\n" : "")
 end
 
 function markdown_table(log, client_id, work_type, work_field, work_rate)
-    str = ""
-    str *= "\n_This invoce is for $(sum([r.hours for r in log.records])) hours worked as $work_type performing $work_field._\n\n"
-    str *= "| Date | Hours | Description | Cost |\n|---|---|---|---|\n"
-    for record in log.records
-      if client_id == record.client_id
-        str *= "| $(record.date) | $(record.hours) | $(record.description) | $(record.hours * work_rate) |\n"
-      end
+  cost = 0
+  str = ""
+  str *= "\n_This invoce is for $(sum([r.hours for r in log.records])) hours worked as $work_type performing $work_field._\n\n"
+  str *= "| Date | Hours | Description | Cost |\n|---|---|---|---|\n"
+  for record in log.records
+    if client_id == record.client_id
+      str *= "| $(record.date) | $(record.hours) | $(record.description) | $(record.hours * work_rate) |\n"
+      cost += record.hours * work_rate
     end
-    str *= "\n#### Total: \$$(log.cost)"
+  end
+  str *= "\n#### Total: \$$cost"
 end

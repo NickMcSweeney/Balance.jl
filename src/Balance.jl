@@ -2,8 +2,10 @@ module Balance
 using DotEnv
 using Dates, UUIDs
 using Crayons, TerminalMenus, ImageInTerminal
+using pandoc_jll
 using BSON: @save, @load
 import Git
+
 
 DotEnv.config()
 const git = Git.git()
@@ -66,10 +68,9 @@ end
 
 mutable struct Log
   records::Vector{Record}
-  cost::Float64
   month::Int64
   function Log(month)
-    new(Vector{Record}(), 0, rate, month)
+    new(Vector{Record}(), month)
   end
 end
 
@@ -82,7 +83,7 @@ function get_clients()
   files = filter(x->contains(x,"client-details"),readdir(filedir))
   clients = Dict()
   for f in files
-    @load f client_details
+    @load joinpath(filedir,f) client_details
     id = get_client_id(client_details)
     clients[id] = f
   end
@@ -90,44 +91,44 @@ function get_clients()
 end
 
 
-function update_logs(client_id, date, hours, description)
-  log_name = "work-record-$(month(date))-$(year(date)).bson"
-  if !isfile(log_name)
-    log = Log(month(date))
-    @save log_name log
+function update_logs(record::WorkItem)
+  log_name = "work-record-$(month(record.date))-$(year(record.date)).bson"
+  log_path = joinpath(filedir,log_name)
+  if !isfile(log_path)
+    log = Log(month(record.date))
+    @save log_path log
   end
-  @load log_name log
-  record = WorkItem(client_id, date, hours, description)
-  update!(log, record)
-  println(log)
-  @save log_name log
-end
-
-function update!(log::Log, record::Record)
+  @load log_path log
   push!(log.records, record)
-  log.cost += record.hours * log.rate
+  println(log)
+  @save log_path log
 end
 
-function generate_invoice(client_id, month, year)
-  client_details = get_clients()[client_id]
+function generate_invoice(client_details::ClientDetails, month::Number, year::Number)
   if !ispath(personal_details_path)
     register_self()
   end
   @load personal_details_path personal_details
   try
     log_name = "work-record-$month-$year.bson"
-    @load log_name log
-    open("invoice-$month-$year.md", "w") do f
+    log_path = joinpath(filedir, log_name)
+    @load log_path log
+    invoice_path = joinpath(filedir, "invoice-$month-$year.md")
+    open(invoice_path, "w") do f
       str = "# Invoice: $(monthname(month)), $year\n"
       str *= markdown_header(personal_details.contact, personal_details.contact)
-      str *= markdown_table(log, client_id, personal_details.title, client_details.work, client_details.billing_rate)
+      str *= markdown_table(log, get_client_id(client_details), personal_details.title, client_details.work, client_details.billing_rate)
       write(f, str)
     end
-    run(`pandoc -f markdown -t latex -o invoice-$month-$year.pdf invoice-$month-$year.md`)
+    pandoc() do exe
+        run(`$exe -f markdown -t pdf -o invoice-$month-$year.pdf $invoice_path`)
+    end
   catch err
     @error "Cannot create invoce: $err"
   end
 end
 
 include("cli.jl")
+
+export log_hours, export_invoice
 end # module Invoice
