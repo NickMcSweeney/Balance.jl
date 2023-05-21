@@ -4,11 +4,10 @@ using Dates, UUIDs
 using Crayons, TerminalMenus, ImageInTerminal
 using pandoc_jll
 using BSON: @save, @load
-import Git
+using Git
 
 
 DotEnv.config()
-const git = Git.git()
 
 filedir = haskey(ENV, "BALANCE_STORE") ? ENV["BALANCE_STORE"] : joinpath(ENV["HOME"],".balance_jl")
 personal_details_path = joinpath(filedir, "personal-details.bson")
@@ -130,5 +129,5 @@ end
 
 include("cli.jl")
 
-export log_hours, export_invoice
+export log_hours, export_invoice, init_sync, sync_changes
 end # module Invoice
