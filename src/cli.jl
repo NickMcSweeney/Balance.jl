@@ -1,3 +1,14 @@
+"""
+  register_client
+
+CLI function that walks through adding a clients details and saves to local system
+ * buisness name
+ * contact name
+ * billing rate
+ * role at client
+ * client contact
+ * client address
+"""
 function register_client()
   println("Is the Client a buisness? (y/N)")
   ans = readline(stdin)
@@ -13,7 +24,7 @@ function register_client()
   println("What is your billing rate at the Client?")
   working_rate = readline(stdin)
   while !isa(working_rate, Number)
-    try 
+    try
       working_rate = parse(Float64, working_rate)
     catch e
       println("Rate given of $working_rate cannot be parsed as a number, try again please.")
@@ -32,6 +43,17 @@ function register_client()
   return client_details
 end
 
+"""
+  register_self
+
+CLI that walks through adding your details and saves it to the system.
+ * Full name
+ * common name
+ * title
+ * company name
+ * contact
+ * address
+"""
 function register_self()
   println("What is your Full Legal Name")
   full_name = readline(stdin)
@@ -63,6 +85,11 @@ function register_self()
   return personal_details
 end
 
+"""
+  select_client
+
+CLI for selecting or creating a new client.
+"""
 function select_client()
   println("Do you want to use an existing Client (Y/n)")
   ans = readline(stdin)
@@ -86,9 +113,16 @@ function select_client()
   else
       println("Creating a new client.")
       return register_client()
-  end 
+  end
 end
 
+"""
+  generate_work_item
+
+- client: ClientDetails
+
+CLI that creates a item of work for a client. Colects information to create a `WorkItem`.
+"""
 function generate_work_item(client::ClientDetails)
   println("--- Logging Hours ---")
   println("What date is this for?")
@@ -105,12 +139,22 @@ function generate_work_item(client::ClientDetails)
   work_item = res == "n" ? generate_work_item(client) : WorkItem(get_client_id(client),day,hours_worked,description)
 end
 
+"""
+  log_hours
+
+select a client, and generate a `WorkItem` and log information to local file system.
+"""
 function log_hours()
   client = select_client()
   work_item = generate_work_item(client)
   update_logs(work_item)
 end
 
+"""
+  export_invoice
+
+CLI to select an invoice and export it.
+"""
 function export_invoice()
   client = select_client()
   println("What month do you want your invoice for? (1-12)")

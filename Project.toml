@@ -1,7 +1,7 @@
 name = "Balance"
 uuid = "e608aa19-b58e-4cf2-84f7-b52917d4011a"
 authors = ["Nick <Shindler25@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
