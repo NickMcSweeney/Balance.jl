@@ -73,6 +73,19 @@ mutable struct Log
   end
 end
 
+function show(log::Log)
+  str = """
+---
+Log [$(Dates.monthname(log.month))]:
+---
+DATE\t\t|\tHOURS\t|\tCLIENT\t\t\t|\tDESCRIPTION
+"""
+  for item in log.records
+    str *= "$(item.date)\t|\t$(item.hours)\t|\t$(item.client_id)\t|\t$(item.description)\n"
+  end
+  print(str)
+end
+
 include("markdown.jl")
 include("sync.jl")
 
@@ -99,7 +112,8 @@ function update_logs(record::WorkItem)
   end
   @load log_path log
   push!(log.records, record)
-  println(log)
+  log.records=sort(log.records, by=x->x.date)
+  show(log)
   @save log_path log
 end
 
@@ -115,7 +129,7 @@ function generate_invoice(client_details::ClientDetails, month::Number, year::Nu
     invoice_path = joinpath(filedir, "invoice-$month-$year.md")
     open(invoice_path, "w") do f
       str = "# Invoice: $(monthname(month)), $year\n"
-      str *= markdown_header(personal_details.contact, personal_details.contact)
+      str *= markdown_header(personal_details.contact, client_details.contact)
       str *= markdown_table(log, get_client_id(client_details), personal_details.title, client_details.work, client_details.billing_rate)
       write(f, str)
     end
